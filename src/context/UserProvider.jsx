@@ -1,33 +1,57 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import UserContext from "./UserContext";
 import axios from "axios";
 
-function UserProvider({children}){
-    const [user, setUser] = useState(()=> {
-        try {
-            const userFromStorage = sessionStorage.getItem("user");
-            return userFromStorage ? JSON.parse(userFromStorage) : null;
-        } catch {
-            return null;
-        }
-    });
+const STORAGE_KEY = "user";
+const API = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 
-    const signUp = async ()=>{
-        const headers = {headers: {"Content-Type": "application/json"}};
-        await axios.post(`${import.meta.env.VITE_API_URL}/user/signup`, {user: user}, headers);
-        setUser({email: "", password: ""});
+function UserProvider({ children }) {
+  const [user, setUser] = useState(() => {
+    try {
+      const raw = sessionStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null; // { id?, email?, token? } | null
+    } catch {
+      return null;
     }
-    const signIn = async()=>{
-        const headers = {headers: {"Content-Type": "application/json"}};
-        const response = await axios.post(`${import.meta.env.VITE_API_URL}/user/signin`, {user:user}, headers);
-        setUser(response.data);
-        sessionStorage.setItem(`user`, JSON.stringify(response.data));
+  });
+
+  useEffect(() => {
+    if (user) {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    } else {
+      sessionStorage.removeItem(STORAGE_KEY);
     }
-    return(
-        <UserContext.Provider value={{user,setUser,signUp,signIn}}>
-        {children}
-        </UserContext.Provider>
-    );
+  }, [user]);
+
+  const signIn = async (email, password) => {
+    const headers = { headers: { "Content-Type": "application/json" } };
+    const res = await axios.post(`${API}/user/signin`, { user: { email, password } }, headers);
+    setUser(res.data);
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(res.data));
+  };
+
+  const signUp = async (email, password) => {
+    const headers = { headers: { "Content-Type": "application/json" } };
+    await axios.post(`${API}/user/signup`, { user: { email, password } }, headers);
+  };
+
+  const signOut = () => {
+    setUser(null);
+    sessionStorage.removeItem(STORAGE_KEY);
+  };
+
+  const value = useMemo(
+    () => ({
+      user,
+      isAuthenticated: Boolean(user?.token),
+      signIn,
+      signUp,
+      signOut,
+    }),
+    [user]
+  );
+
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 
 export default UserProvider;

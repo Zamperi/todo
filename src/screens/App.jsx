@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/useUser.js";
 import axios from "axios";
 import "./App.css";
@@ -8,7 +9,9 @@ const url = "http://localhost:3001";
 export default function App() {
   const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([]);
-  const {user} = useUser();
+  const {user, signOut} = useUser();
+  const navigate = useNavigate();
+
   const headers = user?.token 
   ? { headers: { Authorization: `Bearer ${user.token}` } }
     : undefined;
@@ -43,9 +46,20 @@ export default function App() {
     }
   }
 
+  const handleLogout = () => {
+    signOut();
+    navigate("/signin");
+  };
+
   return (
     <div id="container">
-      <h3>Todos</h3>
+      <div>
+        <h3>Todos</h3>
+        <div>
+          {!!user?.email && <span style={{ marginRight: 12 }}>{user.email}</span>}
+          <button className="logout-button" type="button" onClick={handleLogout}>Log out</button>
+        </div>
+      </div>
       <form>
         <input
         placeholder="Add a new task"
@@ -58,6 +72,7 @@ export default function App() {
           }
         }}
         ></input>
+        <button type="button" onClick={()=>addTask()}>Submit</button>
       </form>
         <ul>
         {tasks.map(item => (

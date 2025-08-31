@@ -1,9 +1,11 @@
 import { createContext } from "react";
 
-export const UserContext = createContext({
-  user: null, //Rakenne {id: email: token: expiresAt: || null}
+const UserContext = createContext({
+  user: null,                 // { id?, email?, token? } | null
   isAuthenticated: false,
-  signIn: async (email, password) => {},
-  signUp: async (email, password) => {},
+  signIn: async (_email, _password) => {},
+  signUp: async (_email, _password) => {},
   signOut: () => {},
 });
+
+export default UserContext;
