@@ -1,4 +1,4 @@
-
+//Harjoituksen vuoksi lisävalidointia
 export function validateEnv() {
   const requiredKeys = ["PORT", "DB_USER", "DB_HOST", "DB_NAME", "DB_PASSWORD", "DB_PORT", "TEST_DB_NAME", "JWT_SECRET_KEY", "DUMMY_HASH"];
   const missing = requiredKeys.filter((key) => !process.env[key]);

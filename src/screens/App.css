@@ -1,18 +1,3 @@
-:root {
-  --bg: #f7f8fa;
-  --panel: #ffffff;
-  --panel-2: #f6f8fb;
-  --text: #0b1020;
-  --muted: #667085;
-  --brand: #2563eb;
-  --brand-2: #1d4ed8;
-  --danger: #dc2626;
-  --danger-2: #b91c1c;
-  --border: #e5e7eb;
-  --radius: 12px;
-  --gap: 12px;
-}
-
 body {
   background: var(--bg);
   color: var(--text);
